@@ -9,8 +9,29 @@ output:
 ## Loading and preprocessing the data
 
 1. First load the data. We want the data columns to be of the right type. 
-```{r}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 if (!file.exists("activity.csv") )
 {
       unzip('activity.zip')
@@ -22,7 +43,8 @@ data <- read.csv("activity.csv", stringsAsFactors=FALSE, colClasses = c("numeric
 
 2. Process/transform the data (if necessary) into a format suitable for your analysis
 
-```{r}
+
+```r
 # remove na values
 dataTidy = data[!is.na(data$steps), ]
 # add dates correctly
@@ -35,36 +57,55 @@ sumStep = aggregate(steps~date, dataTidy, sum)
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 #histogram for total steps taken per day
 hist(sumStep$steps, col="red", main="Total number of steps taken each day", xlab="Steps Per Day")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 rmean <- mean(sumStep$steps)
 rmedian <- median(sumStep$steps)
 # mean total number of steps
 print(rmean)
 ```
 
+```
+## [1] 10766.19
+```
+
 ## What is the average daily activity pattern?
 
-```{r}
+
+```r
 #Calculate total steps for each interval for all days
 totSteps = aggregate(steps~interval, dataTidy, sum)
 
 #Make a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 plot(totSteps$interval,totSteps$steps, type="l", xlab="Interval", ylab="Number of Steps",main="Average Number of Steps across days")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+```r
 #check which 5-minute interval contains the maximum number of steps
 maxIdx = which.max(totSteps$steps)
 
 #Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 maxInterval = totSteps[maxIdx, 'interval']
 print(maxInterval)
+```
 
+```
+## [1] 835
 ```
 
 ## Imputing missing values
 
-```{r}
+
+```r
 # Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with \color{red}{\verb|NA|}NAs)
 
 NATotal <- sum(!complete.cases(data))
@@ -93,25 +134,52 @@ StepsTotalUnion <- aggregate(steps ~ date, data = new_activity, sum, na.rm = TRU
 hist(StepsTotalUnion$steps, main = paste("Total Steps Each Day"), col="blue", xlab="Number of Steps")
 hist(sumStep$steps, main = paste("Total Steps Each Day"), col="green", xlab="Number of Steps", add=T)
 legend("topright", c("Imputed", "Non-imputed"), col=c("blue", "green"), lwd=10)
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+```r
 #calculate Mean
 rmeantotal <- mean(StepsTotalUnion$steps)
 rmeantotal
+```
 
+```
+## [1] 10766.19
+```
+
+```r
 #calculate median
 rmediantotal <- median(StepsTotalUnion$steps)
 rmediantotal
+```
 
+```
+## [1] 10766.19
+```
+
+```r
 #Do these values differ from the estimates from the first part of the assignment?
 rmediandiff <- rmediantotal - rmedian
 print(rmediandiff)
+```
 
+```
+## [1] 1.188679
+```
+
+```r
 rmeandiff <- rmeantotal - rmean
 print(rmeandiff)
 ```
 
+```
+## [1] 0
+```
+
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 #   For this part the \color{red}{\verb|weekdays()|}weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
 
 # Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
@@ -124,3 +192,5 @@ avgStepDateIs = aggregate(steps~interval + dateIs, mean, data=new_activity)
 library(lattice)
 xyplot( steps ~ interval | dateIs, data = avgStepDateIs, type="l", layout=c(1,2), xlab="Interval", ylab="Number of steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
